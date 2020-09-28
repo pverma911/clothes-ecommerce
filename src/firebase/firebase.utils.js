@@ -20,6 +20,43 @@ const config = {
     measurementId: "G-CY1L28BTXR"
 };
 
+export const createUserProfileDocument = async (userAuth, additionalData) =>{
+    // Storing SnapShot of users if it does not exists to store them in DBase:
+
+if(!userAuth) return // Check if user actually exists or not
+
+// Grab the userRefrence:
+
+const userRef = firestore.doc(`users/${userAuth.uid}`);
+
+const snapShot = await userRef.get();       // get SnapShot
+
+// If no snapshot exist we wanna create one:
+
+if(!snapShot.exists){
+    const {displayName, email} = userAuth;
+
+    const createdAt = new Date();
+
+    try{        // Storing in the DBase 
+
+        await userRef.set({
+            displayName,
+            email,
+            createdAt,
+            ...additionalData
+        })
+    }
+
+    catch(e){
+        console.log('Error occured while creating user', e.message);
+
+    }
+
+}
+    return userRef;
+}
+
 
 firebase.initializeApp(config)
 

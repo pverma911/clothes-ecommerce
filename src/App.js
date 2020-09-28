@@ -13,11 +13,19 @@ import Header from './components/header/header.component'
 
 // firebase stuff
 
-import {auth} from './firebase/firebase.utils'
+import {auth, createUserProfileDocument} from './firebase/firebase.utils'
 
 // Route:
 
 import {Switch,Route} from 'react-router-dom'
+
+// Redux
+
+import {connect} from 'react-redux';
+import { setCurrentUser } from './redux/user/user.actions';
+
+
+
 
 
 
@@ -25,21 +33,33 @@ class App extends Component  {
 
   // Adding State for auth users: We add it here to make sure every other component get's it
  
-  constructor(){
-    super();
 
-    this.state= {
-      currentUser: null
-    }
-  }
-
-  // Fore closing Subscription
+  // For closing Subscription
   unsubscribeFromAuth = null;
 
   componentDidMount() {   // Know when user sign-Ins or Sign-out[user state]:
-    this.unsubscribeFromAuth =auth.onAuthStateChanged(user => { // opened Subscription
-      this.setState({currentUser: user})
-      console.log(user)
+
+    const {setCurrentUser} =this.props;
+
+    this.unsubscribeFromAuth =auth.onAuthStateChanged(async userAuth => { // opened Subscription
+      
+      // Storing data in our App state:
+
+      if(userAuth){   // If user exists(Signs in): Get userRef;
+        const userRef = await createUserProfileDocument(userAuth);
+      
+        userRef.onSnapshot(snapShot =>{ // Storing snapShot data in our state
+          setCurrentUser({  // from this.setState to this
+              id: snapShot.id,
+              ...snapShot.data()    //  Get data of the user such as email, name etcc           
+          })
+        });
+      
+      }
+      else{  // Set State to null when user logsOut, bascially userAuth will be Null if the user had logged out so that is why we set it to userAuth value
+        setCurrentUser(userAuth)
+      }
+      // createUserProfileDocument(user);
     })
   }
 
@@ -67,4 +87,13 @@ class App extends Component  {
   
 }
 
-export default App;
+
+// Updating the state
+
+const mapDispatchToProps = dispatch =>({
+  setCurrentUser: user => dispatch(setCurrentUser(user))
+})
+
+
+export default connect(null, mapDispatchToProps)(App);
+ 
