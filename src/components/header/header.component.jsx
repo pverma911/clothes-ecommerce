@@ -3,7 +3,14 @@ import './header.styles.scss'
 import CartIcon from '../cart-icon/cart-icon.component'
 import CartDropdown from '../cart/cart-dropdown.component';
 
+import {createStructuredSelector} from 'reselect';
+
 import {Link} from "react-router-dom"
+
+// Reselectors:
+
+import {selectCartHidden} from '../../redux/cart/cart.selectors'
+import {selectCurrentUser} from '../../redux/user/user.selectors'
 
 // Exclusive code to import .svg files:
 
@@ -56,9 +63,9 @@ const Header = ({ currentUser, hidden }) => (
 // Using Redux state:
 
 
-const mapStateToProps = ({user: {currentUser}, cart: {hidden}}) =>({      // Using state as props
-    currentUser,
-    hidden
+const mapStateToProps = createStructuredSelector({      // Using state as props
+    currentUser: selectCurrentUser,
+    hidden: selectCartHidden
 })
 
 
