@@ -3,6 +3,8 @@ import React from 'react';
 
 import './checkout.styles.scss';
 import CheckoutItem from '../../components/checkout-item/checkout-item.component';
+import StripeCheckoutButton from '../../components/stripe-button/stripe-button.component'
+
 
 // Redux
 
@@ -46,6 +48,13 @@ const CheckoutPage = ({cartItems, total}) =>(
         }
         <div className= 'total'>
             <span> TOTAL: ${total} </span>
+
+            <div className ='test-warning'>
+                *Test credit card* 4242 4242 4242 4242	Any 3 digits Any future date
+                <br />
+
+            </div>
+            <StripeCheckoutButton price = {total} />
         </div>
     </div>
 )
